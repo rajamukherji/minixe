@@ -1,0 +1,35 @@
+CFLAGS := old + ['-g', '-std=gnu99', '-D_GNU_SOURCE', '-pthread']
+LDFLAGS := old + ['-g', '-lm', '-pthread']
+
+if DEBUG then
+	CFLAGS := old + ["-DDEBUG"]
+else
+	CFLAGS := old + ["-O3"]
+end
+
+file("libcsv.o") => fun(Object) do
+	var Source := file("libcsv/libcsv.c")
+	execute(CC, '-c {CFLAGS} -o{Object} -I{Source:dir} {Source}')
+end
+
+file("minilang"):mkdir
+CFLAGS := old + ['-I{file("minilang/minilang.h"):dirname}']
+LDFLAGS := old + ["-lgc", "-ldl"]
+
+var Objects := [
+	file("minixe.o"),
+	file("minilang/minilang.o"),
+	file("minilang/ml_compiler.o"),
+	file("minilang/ml_runtime.o"),
+	file("minilang/ml_types.o"),
+	file("minilang/ml_object.o"),
+	file("minilang/ml_file.o"),
+	file("minilang/ml_iterfns.o"),
+	file("minilang/ml_console.o"),
+	file("minilang/sha256.o"),
+	file("minilang/stringmap.o"),
+	file("minilang/linenoise.o")
+]
+
+c_program(BIN_DIR/"minixe", Objects)
+install(BIN_DIR/"minixe", PREFIX/"bin/minixe", "+x")

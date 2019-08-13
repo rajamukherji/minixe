@@ -1,0 +1,23 @@
+<document title=<b:Title>|
+<do:print("Hello world!\\n")>
+<include file="utils.xe">
+
+<define name="test"|<span colour="blue":<$>>>
+
+<defines name="greet"|
+	<span:Hello <get name="name">>
+	<set name="name":<get name="name">+>
+>
+
+<for var="i" from=1 to=10|
+	<if cond=<do:<$i> = 5>|
+		<then|<node name=<!:N<$i>>:BLAH>>
+	>
+>
+
+<set name="name":Bob>
+
+<for var="i" from=1 to=5:Greeting #<$i>: <greet>\n>
+<greet>
+
+>
