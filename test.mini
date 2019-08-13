@@ -1,3 +1,5 @@
 var D := parse_file("test.xe")
 print(expand(D))
 
+var Html := class()
+
