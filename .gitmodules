@@ -1,0 +1,3 @@
+[submodule "src/minilang"]
+	path = src/minilang
+	url = https://github.com/wrapl/minilang
