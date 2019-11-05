@@ -20,6 +20,22 @@
 	all(Node:content for Node in Content if Node:tag = Cond)
 >>
 
+
+<define name="when"|<do:
+	var Value := expand(Attributes["expr"])
+	var Case := [], Else := [], Result := Else
+	for Node in Content do
+		if Node:tag = "case" and Value = Node:attributes["is"] then
+			for X in Node:content do Case:put(X) end
+			Result := Case
+		end
+		if Node:tag = "else" then
+			for X in Node:content do Else:put(X) end
+		end
+	end
+	ret Result
+>>
+
 <define name="let"|<do:eval(Content, Attributes, [])>>
 
 <define name="code"|<do:

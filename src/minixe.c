@@ -147,6 +147,8 @@ static ml_value_t *parse_value(xe_stream_t *Stream) {
 		return parse_node(Stream);
 	} else if (Next[0] == '[') {
 		return ml_error("ParseError", "List parsing not complete yet at %d in %s", Stream->LineNo, Stream->Source);
+	} else if (Next[0] == '{') {
+		return ml_error("ParseError", "Map parsing not complete yet at %d in %s", Stream->LineNo, Stream->Source);
 	} else if (Next[0] == '\"') {
 		Stream->Next = Next + 1;
 		return parse_string(Stream);
@@ -644,12 +646,10 @@ static ml_value_t *xe_do(void *Data, int Count, ml_value_t **Args) {
 	Context->Globals = Globals;
 	Context->GlobalGet = (ml_getter_t)global_get;
 	mlc_on_error(Context) {
-		mlc_on_error(Context) {
 		printf("Error: %s\n", ml_error_message(Context->Error));
 		const char *Source;
 		int Line;
 		for (int I = 0; ml_error_trace(Context->Error, I, &Source, &Line); ++I) printf("\t%s:%d\n", Source, Line);
-	}
 		exit(1);
 	}
 	mlc_scanner_t *Scanner = ml_scanner("node", Stream, (void *)string_read, Context);
