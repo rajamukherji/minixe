@@ -575,11 +575,20 @@ static ml_value_t *compile_macro(ml_value_t *Value) {
 			xe_stream_t Stream[1];
 			Stream->Data = ml_stringbuffer_get(Source);
 			Stream->read = string_read;
-			mlc_error_t Error;
-			mlc_scanner_t *Scanner = ml_scanner("node", Stream, (void *)string_read, &Error);
+			mlc_context_t Context[1];
+			Context->Globals = Globals;
+			Context->GlobalGet = (ml_getter_t)global_get;
+			mlc_on_error(Context) {
+				printf("Error: %s\n", ml_error_message(Context->Error));
+				const char *Source;
+				int Line;
+				for (int I = 0; ml_error_trace(Context->Error, I, &Source, &Line); ++I) printf("\t%s:%d\n", Source, Line);
+				exit(1);
+			}
+			mlc_scanner_t *Scanner = ml_scanner("node", Stream, (void *)string_read, Context);
 			mlc_expr_t *Expr = ml_accept_command(Scanner, Globals);
 			if (Expr == (mlc_expr_t *)-1) return ml_error("MacroError", "Failed to parse macro");
-			ml_value_t *Closure = ml_compile(Expr, (void *)global_get, Globals, &Error);
+			ml_value_t *Closure = ml_compile(Expr, NULL, Context);
 			ml_value_t *Result = ml_call(Closure, 0, NULL);
 			return Result->Type->deref(Result);
 		} else {
@@ -631,12 +640,23 @@ static ml_value_t *xe_do(void *Data, int Count, ml_value_t **Args) {
 	xe_stream_t Stream[1];
 	Stream->Data = ml_stringbuffer_get(Source);
 	Stream->read = string_read;
-	mlc_error_t Error;
-	mlc_scanner_t *Scanner = ml_scanner("node", Stream, (void *)string_read, &Error);
+	mlc_context_t Context[1];
+	Context->Globals = Globals;
+	Context->GlobalGet = (ml_getter_t)global_get;
+	mlc_on_error(Context) {
+		mlc_on_error(Context) {
+		printf("Error: %s\n", ml_error_message(Context->Error));
+		const char *Source;
+		int Line;
+		for (int I = 0; ml_error_trace(Context->Error, I, &Source, &Line); ++I) printf("\t%s:%d\n", Source, Line);
+	}
+		exit(1);
+	}
+	mlc_scanner_t *Scanner = ml_scanner("node", Stream, (void *)string_read, Context);
 	for (;;) {
 		mlc_expr_t *Expr = ml_accept_command(Scanner, Globals);
 		if (Expr == (mlc_expr_t *)-1) break;
-		ml_value_t *Closure = ml_compile(Expr, (void *)global_get, Globals, &Error);
+		ml_value_t *Closure = ml_compile(Expr, NULL, Context);
 		Result = ml_call(Closure, 0, NULL);
 		if (Result->Type == MLErrorT) return Result;
 		Result = Result->Type->deref(Result);
