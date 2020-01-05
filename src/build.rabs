@@ -20,7 +20,9 @@ var Objects := [
 	file("minixe.o")
 ]
 
---MINILANG_USEGTK := 1
+MINILANG_USEGTK := 1
+MINILANG_USERADB := 1
+MINILANG_USEMPC := 1
 LIBMINILANG := subdir("minilang")."LIBMINILANG"
 
 c_program(BIN_DIR/"minixe", Objects, [LIBMINILANG])

@@ -1,22 +1,24 @@
 <document title=<b:Title>|
-<do:print("Hello world!\\n")>
-<include file="utils.xe">
+<:print("Hello world!\\n")>
+<!include file="utils.xe">
 
-<define name="test"|<span colour="blue":<$>>>
+<!define name="test"|<span colour="blue":<$>>>
 
-<defines name="greet"|
-	<span:Hello <get name="name">>
-	<set name="name":<get name="name">+>
+<!define name="greet"|
+	<span:Hello <!get name="name">>
+	<!set name="name":<!get name="name">+>
 >
 
-<for var="i" from=1 to=10|
-	<if cond=<do:<$i> = 5>|
-		<then|<node name=<!:N<$i>>:BLAH>>
+<!for var="i" from=1 to=10|
+	<!do:print('i = {<$i>}\n')>
+	<!if cond=<:<$i> = 5>|
+		<then|<node name=<:'N{<$i>}'>:THEN>>
+		<else|<node name=<:'N{<$i>}'>:ELSE>>
 	>
 >
 
-<for var="i" from=1 to=20:
-	<do:'i = {<$i>}'> =\> <when expr=<do:<$i> % 15>|
+<!for var="i" from=1 to=20:
+	i = <$i> =\> <!when expr=<:<$i> % 15>|
 		<case is=0:_0_>
 		<case is=3:_3_>
 		<case is=5:_5_>
@@ -24,9 +26,16 @@
 	>
 >
 
-<set name="name":Bob>
+<!set name="name":Bob>
 
-<for var="i" from=1 to=5:Greeting #<$i>: <greet>\n>
+<!for var="i" from=1 to=5:Greeting #<$i>: <greet>\n>
 <greet>
+
+<!function name="list":
+	var List := all(1 .. 10)
+	<node:<:List>>
+>
+
+<list>
 
 >

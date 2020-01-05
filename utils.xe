@@ -1,8 +1,6 @@
-<do:print("utils.xe\\n")>
+<:print("utils.xe\\n")>
 
-<define name="!"|<do:sum('{S}' for S in Content)>>
-
-<define name="for"|<do:
+<!function name="!for":
 	var Var := Attributes["var"]
 	var From := Attributes["from"]
 	var To := Attributes["to"]
@@ -13,15 +11,14 @@
 		end
 	end
 	ret Content2
->>
+>
 
-<define name="if"|<do:
+<!function name="!if":
 	var Cond := expand(Attributes["cond"]) and "then" or "else"
 	all(Node:content for Node in Content if Node:tag = Cond)
->>
+>
 
-
-<define name="when"|<do:
+<!function name="!when":
 	var Value := expand(Attributes["expr"])
 	var Case := [], Else := [], Result := Else
 	for Node in Content do
@@ -34,13 +31,13 @@
 		end
 	end
 	ret Result
->>
+>
 
-<define name="let"|<do:eval(Content, Attributes, [])>>
+<!function name="!let":eval(Content, Attributes, [])>
 
-<define name="code"|<do:
->>
+<!function name="!code":
+>
 
-<do:var Env := {}>
-<define name="set"|<do:Env[Attributes["name"]] := expand(Content); nil>>
-<define name="get"|<do:Env[Attributes["name"]]>>
+<!do:var Env := {}>
+<!function name="!set":Env[Attributes["name"]] := expand(Content); nil>
+<!function name="!get":Env[Attributes["name"]]>
