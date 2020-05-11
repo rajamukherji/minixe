@@ -1,9 +1,9 @@
 <:print("utils.xe\\n")>
 
-<!function name="!for":
-	var Var := Attributes["var"]
-	var From := Attributes["from"]
-	var To := Attributes["to"]
+<!function "!for":
+	var Var := Attributes[1]
+	var From := Attributes[2]
+	var To := Attributes[3]
 	var Content2 := []
 	for X in From .. To do
 		for Y in Content do
@@ -13,16 +13,16 @@
 	ret Content2
 >
 
-<!function name="!if":
-	var Cond := expand(Attributes["cond"]) and "then" or "else"
+<!function "!if":
+	var Cond := expand(Attributes[1]) and "then" or "else"
 	all(Node:content for Node in Content if Node:tag = Cond)
 >
 
-<!function name="!when":
-	var Value := expand(Attributes["expr"])
+<!function "!when":
+	var Value := expand(Attributes[1])
 	var Case := [], Else := [], Result := Else
 	for Node in Content do
-		if Node:tag = "case" and Value = Node:attributes["is"] then
+		if Node:tag = "case" and Value = Node:attributes[1] then
 			for X in Node:content do Case:put(X) end
 			Result := Case
 		end
@@ -33,11 +33,11 @@
 	ret Result
 >
 
-<!function name="!let":eval(Content, Attributes, [])>
+<!function "!let":eval(Content, Attributes, [])>
 
-<!function name="!code":
+<!function "!code":
 >
 
 <!do:var Env := {}>
-<!function name="!set":Env[Attributes["name"]] := expand(Content); nil>
-<!function name="!get":Env[Attributes["name"]]>
+<!function "!set":Env[Attributes[1]] := expand(Content); nil>
+<!function "!get":Env[Attributes[1]]>

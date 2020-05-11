@@ -7,13 +7,8 @@ else
 	CFLAGS := old + ["-O3"]
 end
 
-file("libcsv.o") => fun(Object) do
-	var Source := file("libcsv/libcsv.c")
-	execute(CC, '-c {CFLAGS} -o{Object} -I{Source:dir} {Source}')
-end
-
 file("minilang"):mkdir
-CFLAGS := old + ['-I{file("minilang/minilang.h"):dirname}']
+CFLAGS := old + ['-I{file("minilang/src/minilang.h"):dirname}']
 LDFLAGS := old + ["-lgc", "-ldl"]
 
 var Objects := [
@@ -23,7 +18,32 @@ var Objects := [
 MINILANG_USEGTK := 1
 MINILANG_USERADB := 1
 MINILANG_USEMPC := 1
-LIBMINILANG := subdir("minilang")."LIBMINILANG"
+MINILANG_MODULES := 1
 
-c_program(BIN_DIR/"minixe", Objects, [LIBMINILANG])
+subdir("minilang")
+
+LIBMINILANG := context("/obj/minilang/obj")::LIBMINILANG
+
+for Source in PATH:ls(".*\\.c") do
+	Source:basename:find("_init") and next
+	var Target := file(Source:basename:replace(".c", "_init.c"))[Source] => fun() do
+		Target:open("w"):close
+		var Init := shell("cc", CFLAGS, "-E -P -DGENERATE_INIT", Source)
+		var Out := Target:open("w")
+		for Line in Init / "\n" do
+			loop
+				var I := while Line:find("INIT_CODE ")
+				Line := Line[I + 10, 0]
+				var J := while Line:find(");")
+				Out:write(Line[1, J + 2])
+				Out:write("\n")
+				Line := Line[J + 2, 0]
+			end
+		end
+		Out:close
+	end
+end
+
+PREBUILDS := old + [LIBMINILANG]
+DEFAULT[c_program(BIN_DIR/"minixe", Objects, [LIBMINILANG])]
 install(BIN_DIR/"minixe", PREFIX/"bin/minixe", "+x")
